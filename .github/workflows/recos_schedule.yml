@@ -1,0 +1,33 @@
+name: Daily Broker Recommendations Bot
+
+on:
+  schedule:
+    # Runs at 03:15 UTC (8:45 AM IST) Monday through Friday
+    - cron: '15 3 * * 1-5'
+  workflow_dispatch: 
+
+jobs:
+  run-recos:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install Google Chrome Browser
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y google-chrome-stable
+
+      - name: Install Dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run Recommendations Script
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: python recos.py
